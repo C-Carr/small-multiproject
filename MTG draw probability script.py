@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[68]:
 
 
 import random
@@ -43,8 +43,55 @@ for hand_lands, num_hands in sorted(land_counts.items()):
     print(print_line)
 
 
-# In[ ]:
+# In[71]:
 
 
+import random
+"""
+dictionary tree containing card-types as keys and number of cards as values main branches being lands and spells
+Note: I can change the card types to denote important cards and change functionality to reflect chances of drawing combo
+"""
+deck = {'lands':{'green':'g' * 4,
+              'blue': 'b' * 16,
+              'red': 'r' * 0,
+              'white': 'w' * 0,
+              'black': 'l' * 0},
+       'spells':{'splash': 's' * 3,
+              'main': 'm' * 37}}
+def shuffle_deck(): 
+    """
+    Returns shuffled list of keys 
+    """
+    make_deck = []
+    while len(make_deck) <= 7:
+        for cards, types in deck.items():
+            try:
+                for key in types:
+                    make_deck += types[key]
+            except IndexError:
+                pass
+        random.shuffle(make_deck)
+        return make_deck
+       
+def new_hand(shuffle_deck):
+    """
+    returns random 7 values from shuffle_deck
+    """
+    hand = shuffle_deck[:7:]
+    return hand
 
+def count_cards(hand):
+    """
+    returns count of cards in hand 
+    """
+    land_counts = {i: 0 for i in range(8)}
+    for hand_num in range(practice_rounds):
+        hand = new_hand(num_lands)
+        hand_lands = hand.count()
+        land_counts[hand_lands] += 1
+    return land_counts
+
+practice_rounds = 10000
+
+new_hand(shuffle_deck())S
 
