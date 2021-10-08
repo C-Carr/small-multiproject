@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[68]:
+# In[ ]:
 
 
 import random
@@ -43,10 +43,11 @@ for hand_lands, num_hands in sorted(land_counts.items()):
     print(print_line)
 
 
-# In[71]:
+# In[26]:
 
 
 import random
+from pandas import DataFrame
 """
 dictionary tree containing card-types as keys and number of cards as values main branches being lands and spells
 Note: I can change the card types to denote important cards and change functionality to reflect chances of drawing combo
@@ -63,7 +64,7 @@ def shuffle_deck():
     Returns shuffled list of keys 
     """
     make_deck = []
-    while len(make_deck) <= 7:
+    while len(make_deck) <= 60:
         for cards, types in deck.items():
             try:
                 for key in types:
@@ -77,21 +78,54 @@ def new_hand(shuffle_deck):
     """
     returns random 7 values from shuffle_deck
     """
-    hand = shuffle_deck[:7:]
+    hand_size = 7
+    hand = []
+    for i in range(0, hand_size):
+        hand.append(shuffle_deck[i])
     return hand
 
-def count_cards(hand):
+def count_lands():
     """
     returns count of cards in hand 
     """
-    land_counts = {i: 0 for i in range(8)}
+    find_green = {i: 0 for i in range(8)}
+    find_blue = {i: 0 for i in range(8)}
+    find_red = {i: 0 for i in range(8)}
+    find_white = {i: 0 for i in range(8)}
+    find_black = {i: 0 for i in range(8)}
+    find_splash = {i: 0 for i in range(8)}
+    find_main = {i: 0 for i in range(8)}
     for hand_num in range(practice_rounds):
-        hand = new_hand(num_lands)
-        hand_lands = hand.count()
-        land_counts[hand_lands] += 1
-    return land_counts
+        draw = new_hand(shuffle_deck())
+        grn = draw.count('g')
+        blu = draw.count('b')
+        rd = draw.count('r')
+        wht = draw.count('w')
+        bl = draw.count('l')
+        spl = draw.count('s')
+        mn = draw.count('m')
+        find_green[grn] += 1
+        find_blue[blu] += 1
+        find_red[rd] += 1
+        find_white[wht] += 1
+        find_black[bl] += 1
+        find_splash[spl] += 1
+        find_main[mn] += 1
+    return find_green, find_blue, find_red, find_white, find_black, find_splash, find_main
 
 practice_rounds = 10000
+Frame_Count = DataFrame(count_lands(), index =('green', 
+                                'blue',
+                                'red',
+                                'white',
+                                'black',
+                                'splash',
+                                'main'))
+Frame_Count
 
-new_hand(shuffle_deck())S
+
+# In[ ]:
+
+
+
 
