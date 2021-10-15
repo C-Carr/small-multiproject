@@ -43,7 +43,7 @@ for hand_lands, num_hands in sorted(land_counts.items()):
     print(print_line)
 
 
-# In[26]:
+# In[4]:
 
 
 import random
@@ -59,6 +59,9 @@ deck = {'lands':{'green':'g' * 4,
               'black': 'l' * 0},
        'spells':{'splash': 's' * 3,
               'main': 'm' * 37}}
+
+practice_rounds = 100000
+
 def shuffle_deck(): 
     """
     Returns shuffled list of keys 
@@ -87,6 +90,9 @@ def new_hand(shuffle_deck):
 def count_lands():
     """
     returns count of cards in hand 
+    could be made better by making a for loop and 'deck'
+    for key in deck, lands,:
+        draw.count(value)
     """
     find_green = {i: 0 for i in range(8)}
     find_blue = {i: 0 for i in range(8)}
@@ -113,19 +119,22 @@ def count_lands():
         find_main[mn] += 1
     return find_green, find_blue, find_red, find_white, find_black, find_splash, find_main
 
-practice_rounds = 10000
-Frame_Count = DataFrame(count_lands(), index =('green', 
-                                'blue',
-                                'red',
-                                'white',
-                                'black',
-                                'splash',
-                                'main'))
-Frame_Count
+def Deck_Frame():    
+    hand_size = range(8)
+    Frame_Count = DataFrame(count_lands(), 
+                            index = ('green', 
+                                    'blue',
+                                    'red',
+                                    'white',
+                                    'black',
+                                    'splash',
+                                    'main'),
+                           columns = (hand_size))
+    return Frame_Count
 
+def Find_Percent():
+    percent = Deck_Frame().apply((lambda x: 100 * x / float(x.sum())), axis=1)
+    return percent
 
-# In[ ]:
-
-
-
+Find_Percent()
 
