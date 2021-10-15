@@ -119,7 +119,10 @@ def count_lands():
         find_main[mn] += 1
     return find_green, find_blue, find_red, find_white, find_black, find_splash, find_main
 
-def Deck_Frame():    
+def Deck_Frame():
+    """
+    Data from count_lands go into a DataFrame format with columns = card count 0-7, index = card types
+    """
     hand_size = range(8)
     Frame_Count = DataFrame(count_lands(), 
                             index = ('green', 
@@ -133,6 +136,9 @@ def Deck_Frame():
     return Frame_Count
 
 def Find_Percent():
+    """
+    Apply percentage calculation across rows to calculate percentages.
+    """
     percent = Deck_Frame().apply((lambda x: 100 * x / float(x.sum())), axis=1)
     return percent
 
