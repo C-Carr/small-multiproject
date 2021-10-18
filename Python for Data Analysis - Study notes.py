@@ -1255,7 +1255,7 @@ dup_labels = pd.Index(['foo', 'foo', 'bar', 'bar'])
 dup_labels
 
 
-# In[5]:
+# In[ ]:
 
 
 #selections with duplicate labels will select all occurrences of that label
@@ -1265,7 +1265,7 @@ obj = Series(range(4), index=['d', 'b', 'a', 'c'])
 obj.sort_index()
 
 
-# In[6]:
+# In[ ]:
 
 
 df = DataFrame([[1.4, np.nan], [7.1, -4.5],
@@ -1275,54 +1275,54 @@ df = DataFrame([[1.4, np.nan], [7.1, -4.5],
 df
 
 
-# In[7]:
+# In[ ]:
 
 
 #Calling DataFrame's sum method returns a Series containing column sums:
 df.sum()
 
 
-# In[8]:
+# In[ ]:
 
 
 #passing axis='columns' or axis=1 sums across the columns instead:
 df.sum(axis='columns')
 
 
-# In[9]:
+# In[ ]:
 
 
 #NA values are excluded unless the entire slice (row or column in this case) is NA This can be disabled with the skipna option
 df.mean(axis='columns', skipna=False)
 
 
-# In[10]:
+# In[ ]:
 
 
 df.mean(axis='columns')
 
 
-# In[11]:
+# In[ ]:
 
 
 #Some methods like idxmin and idxmax, return indirect statistics like the index value where the minimum or maximum values are attained
 df.idxmax()
 
 
-# In[12]:
+# In[ ]:
 
 
 df.cumsum()
 
 
-# In[13]:
+# In[ ]:
 
 
 #another type of method is neither a reduction nor an accumulation. descrive is one such example, producing multiple summary stat
 df.describe()
 
 
-# In[14]:
+# In[ ]:
 
 
 #on non-numeric data, describe produces alternative summary statistics 
@@ -1330,16 +1330,579 @@ obj = Series(['a', 'a', 'b', 'c'] * 4)
 obj.describe()
 
 
-# In[16]:
+# In[ ]:
+
+
+#Indexing into a DataFrame is for retrieving one or more columns either with a single value or sequence
+data = DataFrame(np.arange(16).reshape((4, 4)),
+                index=['Ohio', 'Colorado', 'Utah', 'New York'],
+                columns=['one', 'two', 'three', 'four'])
+data
+
+
+# In[ ]:
+
+
+data['two']
+
+
+# In[ ]:
+
+
+data[['three', 'one']]
+
+
+# In[ ]:
+
+
+data[:2]
+
+
+# In[ ]:
+
+
+data[data['three']>5]
+
+
+# In[ ]:
+
+
+data<5
+
+
+# In[ ]:
+
+
+data[data<5]=0
+data
+
+
+# In[ ]:
+
+
+data.loc['Colorado', ['two', 'three']]
+
+
+# In[ ]:
+
+
+data.iloc[2, [3, 0, 1]]
+
+
+# In[ ]:
+
+
+data.iloc[[1, 2], [3, 0, 1]]
+
+
+# In[ ]:
+
+
+#both indexing functions work with slices in addition to single labels or lists of labels 
+data.loc[:'Utah', 'two']
+
+
+# In[ ]:
+
+
+data.iloc[:, :3][data.three > 5]
+
+
+# In[ ]:
+
+
+#Integer Indexes 
+#pandas objects indexed by integers are wierd because of some differences with indexing semantics on built in python data 
+#structures like lists and tupbles. you might not expect the following code to generate an error
+ser = Series(np.arange(3.))
+ser
+
+
+# In[ ]:
+
+
+ser[-1]
+
+
+# In[ ]:
+
+
+#In this case pandas could "fall back" on integer indexing but it's difficult to do this in general without introducing bugs
+# Here we have an index containing 0, 1, 2, but inferring what the user wants (label based indexing or position based) is hard
+ser
+
+
+# In[ ]:
+
+
+#with a non integer index there's no potential for ambiguity
+ser2 = Series(np.arange(3.), index=['a', 'b', 'c'])
+ser2[-1]
+
+
+# In[ ]:
+
+
+#to keep things consistent if you have an axis index containing integers, data selection will always be label-oriented.
+#for more precise handling, use loc(for labels) or iloc(for integers)
+ser.iloc[:1]
+
+
+# In[ ]:
+
+
+#Arithmetic and Data Alignment
+s1 = Series([7.3, -2.5, 3.4, 1.5], index=['a', 'c', 'd', 'e'])
+s2 = Series([-2.1, 3.6, -1.5, 4, 3.1], index=['a', 'c', 'e', 'f', 'g'])
+s1
+
+
+# In[ ]:
+
+
+s2
+
+
+# In[ ]:
+
+
+s1 + s2
+
+
+# In[ ]:
+
+
+#In case of DataFrame, alignment is performed on both the rows and the columns
+df1 = DataFrame(np.arange(9.).reshape((3, 3)), columns=list('bcd'), index=['Ohio', 'Texas', 'Colorado'])
+df2 = DataFrame(np.arange(12.).reshape((4, 3)), columns=list('bde'), index=['Utah', 'Ohio', 'Texas', 'Oregon'])
+df1
+
+
+# In[ ]:
+
+
+df2
+
+
+# In[ ]:
+
+
+df1 + df2
+
+
+# In[ ]:
+
+
+#If you add DataFrame objects with no column or row labels in common, the result will contain all nulls. 
+df1 = DataFrame({'A': [1, 2]})
+df2 = DataFrame({'B': [3, 4]})
+df1
+
+
+# In[ ]:
+
+
+df2
+
+
+# In[ ]:
+
+
+df1 + df2
+
+
+# In[6]:
+
+
+#Arithmetic methods with fill values
+#In arithmatic operations between differently indexed objects you might want to fill with a special value like 0 when an
+#axis label is found in one object but not the other
+df1 = DataFrame(np.arange(12.).reshape((3, 4)), columns = list('abcd'))
+df2 = DataFrame(np.arange(20.).reshape((4, 5)), columns = list('abcde'))
+df2.loc[1, 'b'] = np.nan
+df1
+
+
+# In[7]:
+
+
+df2
+
+
+# In[8]:
+
+
+#adding these together makes nan for areas that don't overlap 
+df1 + df2
+
+
+# In[9]:
+
+
+#using an add methon on df1 I pass df2 and an argument to fill_value:
+df1.add(df2, fill_value=0)
+
+
+# In[12]:
+
+
+#these two statements are equivalent:
+1/df1, df1.rdiv(1)
+
+
+# In[15]:
+
+
+#when indexing a Series or DataFrame you can also specify a different fill value
+df1.reindex(columns=df2.columns, fill_value=0)
+
+
+# In[17]:
+
+
+#operations between DataFrame and Series. As with NumPy arrays and different dimensions, arithmetic between DataFrame and
+#Series is also defined.First as a motivating example, consider the difference between a two-dimensional and one of its rows
+arr = np.arange(12.).reshape((3, 4))
+arr
+
+
+# In[18]:
+
+
+arr[0]
+
+
+# In[19]:
+
+
+arr - arr[0]
+
+
+# In[20]:
+
+
+#when we subtract arr[0] from arr, the subtraction is performed once for each row. This is referred to as broadcasting
+frame = DataFrame(np.arange(12.).reshape((4, 3)),
+                 columns = list('bde'),
+                 index = ['Utah', 'Ohio', 'Texas', 'Oregon'])
+series = frame.iloc[0]
+frame
+
+
+# In[21]:
+
+
+series
+
+
+# In[22]:
+
+
+#by default arithmatic between DataFrame and Series matches the index of the Series on the DataFrame's columns broadcasting
+frame - series
+
+
+# In[23]:
+
+
+#if an index value is not found in either the DataFrame's columns or the Series's index, the objects will be reindexes to
+#form the union
+series2 = Series(range(3), index=['b', 'e', 'f'])
+frame + series2
+
+
+# In[24]:
+
+
+#if you want to instead broadcast over the columns matching on the rows you have to use one of the arithmetic methods
+series3 = frame['d']
+frame
+
+
+# In[25]:
+
+
+series3
+
+
+# In[26]:
+
+
+frame.sub(series3, axis='index')
+
+
+# In[3]:
+
+
+#function application and mapping
+#NumPy ufuncs (element-wise array methods) also work with pandas objects:
+frame = DataFrame(np.random.randn(4, 3), columns = list('bde'),
+                 index = ['Utah', 'Ohio', 'Texas', 'Oregon'])
+frame
+
+
+# In[4]:
+
+
+np.abs(frame)
+
+
+# In[5]:
+
+
+#Another frequent operation is applying a function on one-dimensional arrays to each column or row. DataFrame's apply method
+# does exactly this:
+f = lambda x: x.max() - x.min()
+frame.apply(f)
+#Here the function f, which computes the difference between the maximum and minimum of a Series, is invoked once on each
+# Column in frame. The result is a Series having the columns of frame as its index.
+
+
+# In[6]:
+
+
+#If you pass axis='columns' to apply, the function will be invoked once per row instead:
+frame.apply(f, axis='columns')
+#Many of the most common array statistics (like sum and mean) are DataFrame methods, so using apply is not necessary.
+
+
+# In[8]:
+
+
+#The function passed to apply need not return a scalar value; it can also return a Series with multiple values:
+def f(x):
+    return Series([x.min(), x.max()], index=['min', 'max'])
+frame.apply(f)
+
+
+# In[11]:
+
+
+#Element-wise Python functions can be used, too. Suppose you wanted to compute a formatted string from each floating-point
+#value in frame. You can do this with apply map:
+format = lambda x: '%.2f' % x
+frame.applymap(format)
+
+
+# In[12]:
+
+
+#The reason for the name applymap is that Series has a map method for applying an element-wise function:
+frame['e'].map(format)
+
+
+# In[13]:
+
+
+#Sorting and Ranking
+#Sorting a dataset by some criterion is another important built-in operation. To sort lexicographically by row or column index
+#use the sort_index method, which returns a new, sorted object:
+obj = Series(range(4), index=['d', 'a', 'b', 'c'])
+obj.sort_index()
+
+
+# In[2]:
+
+
+#With a DataFrame, you can sort by index or either axis:
+frame = DataFrame(np.arange(8).reshape((2, 4)),
+                 index=['three', 'one'],
+                 columns=['d', 'a', 'b', 'c'])
+frame.sort_index()
+
+
+# In[3]:
+
+
+frame.sort_index(axis=1)
+
+
+# In[4]:
+
+
+#the data is sorted in ascending order by default, but can be sorted in descending order, too:
+frame.sort_index(axis=1, ascending=False)
+
+
+# In[6]:
+
+
+#Any missing values are sorted to the end of the Series by default:
+obj = Series([4, np.nan, 7, np.nan, -3, 2])
+obj.sort_values()
+
+
+# In[7]:
+
+
+#When sorting a dataframe, you can use the data in one or more columns as the sort keys. To do so, pass one or more column
+# names to the by option of sort_values:
+frame = DataFrame({'b': [4, 7, -3, 2], 'a': [0, 1, 0, 1]})
+frame
+
+
+# In[8]:
+
+
+frame.sort_values(by='b')
+
+
+# In[9]:
+
+
+frame.sort_values(by=['a', 'b'])
+
+
+# In[2]:
+
+
+#Ranking assigns ranks from one through the number of valid data points in an array. The rank methods for Series and Dataframe
+# are the place to look; by default rank breaks ties by assigning each group the mean rank:
+obj = Series([7, -5, 7, 4, 2, 0, 4])
+obj.rank()
+
+
+# In[3]:
+
+
+#Ranks can also be assigned according to the order in which they're observed in the data: 
+obj.rank(method='first')
+#Here instead of using the average rank 6.5 for the entries 0 and 2 they instead have been set to 6 and 7
+
+
+# In[4]:
+
+
+#You can rank in descending order, too: 
+#Assign tie values the maximum rank in the group
+obj.rank(ascending=False, method='max')
+
+
+# In[11]:
+
+
+#DataFrame can compute ranks over the rows or the columns:
+frame = DataFrame({'b': [4.3, 7, -3, 2], 
+                   'a': [0, 1, 0, 1], 
+                   'c': [-2, 5, 8, -2.5]})
+frame.rank(axis='columns')
+
+
+# In[12]:
+
+
+#Axis Indexes with Duplicate Labels
+#While many pandas functions (like reindex) require that the labels be unique, it's not mandatory:
+obj = Series(range(5), index=['a', 'a', 'b', 'b', 'c'])
+obj
+
+
+# In[13]:
+
+
+obj.index.is_unique
+
+
+# In[17]:
+
+
+#Data selection is one of the main things that behaves differently with duplicates. Indexing a label with multiple entries
+# returns a Series, while single entries return a scalar value:
+obj['a']
+
+
+# In[15]:
+
+
+obj['c']
+
+
+# In[18]:
+
+
+#this can make code complicated. Output type from indexing can vary based on whether a label is repeated or not
+#THe same logic extends to indexing rows in a DataFrame:
+df = DataFrame(np.random.randn(4, 3), index =['a', 'a', 'b', 'b'])
+df
+
+
+# In[19]:
+
+
+df.loc['b']
+
+
+# In[24]:
+
+
+#Summarizing and Computing Descriptive Statistics
+# pandas objects are equipped with a set of common mathematical and statistical methods. Most of these fall into the category
+# of reductions or summary statistics, methods that extract a sengle value(like sum or mean) from a Series or DataFrame
+df = DataFrame([[1.4, np.nan], 
+              [7.1, -4.5],
+              [np.nan, np.nan],
+              [0.75, -1.3]],
+              index=['a', 'b', 'c', 'd'],
+              columns=['one', 'two'])
+df
+
+
+# In[26]:
+
+
+#calling DataFrame's sum method returns a Series containing column sums:
+df.sum()
+
+
+# In[27]:
+
+
+#passing axis='columns' or axis=1 sums across the columns instead:
+df.sum(axis='columns')
+
+
+# In[31]:
+
+
+#NA values are excluded unless the entire slice (row or column in this case) is NA. This can be disabled with skipna option
+df.mean(axis='columns', skipna=False)
+
+
+# In[32]:
+
+
+#Some methods like idxmin and idxmax return indirect statistics like the index value where the minimum or maximum values are attained
+df.idxmax()
+
+
+# In[33]:
+
+
+#Other methods are accumulations:
+df.cumsum()
+
+
+# In[34]:
+
+
+#Another type of method is neither a reduction nor an accumulation. describe is one such example:
+df.describe()
+
+
+# In[35]:
+
+
+#On non-numerical data, describe produces alternative sumary statistics:
+obj = Series(['a', 'a', 'b', 'c'] * 4)
+obj.describe()
+
+
+# In[36]:
 
 
 #Correlation and Covariance
 #Some summary statistics, like correlation and covariance, are computed from pairs of arguments. 
 import pandas_datareader.data as web
-
-
-# In[18]:
-
 
 all_data = {ticker: web.get_data_yahoo(ticker)
            for ticker in ['AAPL', 'IBM', 'MSFT', 'GOOG']}
@@ -1351,123 +1914,140 @@ returns = price.pct_change()
 returns.tail()
 
 
-# In[2]:
+# In[38]:
 
 
-#Indexing into a DataFrame is for retrieving one or more columns either with a single value or sequence
-data = DataFrame(np.arange(16).reshape((4, 4)),
-                index=['Ohio', 'Colorado', 'Utah', 'New York'],
-                columns=['one', 'two', 'three', 'four'])
-data
+#I now compute percent changes of the prices
+returns = price.pct_change()
+returns.tail()
 
 
-# In[3]:
+# In[39]:
 
 
-data['two']
+returns['MSFT'].corr(returns['IBM'])
+
+
+# In[40]:
+
+
+returns['MSFT'].cov(returns['IBM'])
+
+
+# In[41]:
+
+
+#Since MSFT is a valid Python attribute, we can also select these columns using more concise syntax:
+returns.MSFT.corr(returns.IBM)
+
+
+# In[42]:
+
+
+#DataFrame's corr and cov methods, on the other hand, return a full correlation or covariance matrix as a DataFrame: 
+returns.corr()
+
+
+# In[43]:
+
+
+returns.cov()
+
+
+# In[44]:
+
+
+#Using DataFrame's corrwith method, you can compute pairwise correlations between a DataFrame's columns or rows with 
+# another Series or DataFrame. Passing a Series returns a Series with the correlation value computed for each column:
+returns.corrwith(returns.IBM)
+
+
+# In[45]:
+
+
+#Passing a DataFrame computes the correlations of matching column names. Here I compute correlations of percent changes 
+# with volume
+returns.corrwith(volume)
+
+
+# In[46]:
+
+
+#Unique Values, Value Counts, and Membership
+#Another class of related methods extracts information about the values contained in a one-dimensional Series.
+obj = Series(['c', 'a', 'd', 'a', 'a', 'b', 'b', 'c', 'c'])
+#The first function is unique, which gives you an array of the unique values in a Series:
+uniques = obj.unique()
+uniques
+
+
+# In[47]:
+
+
+#The unique values are not necessarily returned in sorted order, but could be sorted after the fact if needed (uniques.sort())
+# Relatedly, value_counts computes a Series containing value frequencies:
+obj.value_counts()
+
+
+# In[48]:
+
+
+#The Series is sorted by value in descending order as a convenience. value_counts is also available as a top-level pandas
+# method that can be used with any array or sequence:
+pd.value_counts(obj.values, sort=False)
+
+
+# In[49]:
+
+
+#isin performs a vectorized set membership check and can be useful in filtering a dataset down to a subset of values in a
+# Series or column in a DataFrame:
+obj
+
+
+# In[51]:
+
+
+mask = obj.isin(['b', 'c'])
+mask
+
+
+# In[53]:
+
+
+obj[mask]
 
 
 # In[4]:
 
 
-data[['three', 'one']]
+#page 163
+#related to isin is the Index.get_indexer method, which gives you an index array from an array of possibly non-distinct values
+to_match = Series(['c', 'a', 'b', 'b', 'c', 'a'])
+unique_vals = Series(['c', 'b', 'a'])
+pd.Index(unique_vals).get_indexer(to_match)
 
 
 # In[5]:
 
 
-data[:2]
+data = DataFrame({'Qu1':[1, 3, 4, 3, 4],
+                 'Qu2': [2, 3, 1, 2, 3],
+                 'Qu3': [1, 5, 2, 4, 4]})
+data
 
 
 # In[6]:
 
 
-data[data['three']>5]
-
-
-# In[7]:
-
-
-data<5
-
-
-# In[9]:
-
-
-data[data<5]=0
-data
-
-
-# In[10]:
-
-
-data.loc['Colorado', ['two', 'three']]
-
-
-# In[11]:
-
-
-data.iloc[2, [3, 0, 1]]
-
-
-# In[12]:
-
-
-data.iloc[[1, 2], [3, 0, 1]]
-
-
-# In[15]:
-
-
-#both indexing functions work with slices in addition to single labels or lists of labels 
-data.loc[:'Utah', 'two']
-
-
-# In[16]:
-
-
-data.iloc[:, :3][data.three > 5]
-
-
-# In[2]:
-
-
-#Integer Indexes 
-#pandas objects indexed by integers are wierd because of some differences with indexing semantics on built in python data 
-#structures like lists and tupbles. you might not expect the following code to generate an error
-ser = Series(np.arange(3.))
-ser
-
-
-# In[3]:
-
-
-ser[-1]
-
-
-# In[4]:
-
-
-#In this case pandas could "fall back" on integer indexing but it's difficult to do this in general without introducing bugs
-# Here we have an index containing 0, 1, 2, but inferring what the user wants (label based indexing or position based) is hard
-ser
-
-
-# In[5]:
-
-
-ser2 = Series(np.arange(3.), index=['a', 'b', 'c'])
-ser2[-1]
+#passing pandas.value_counts to this DataFrame's apply function gives:
+result = data.apply(pd.value_counts).fillna(0)
+result
 
 
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
-
+#here the row labels in the result are the distinct values ocurring in all of the columns. The values are the respective 
+#counts of these values in each column. 
 
